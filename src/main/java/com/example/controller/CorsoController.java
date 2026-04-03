@@ -10,7 +10,7 @@ import jakarta.ws.rs.core.Response;
 
 import java.util.List;
 
-@Path("/corsi")
+@Path("/api/corsi")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 public class CorsoController {
@@ -43,6 +43,22 @@ public class CorsoController {
         Corso created = corsoService.createCorso(corso);
         return Response.status(Response.Status.CREATED).entity(created).build();
     }
+
+    // 📌 ISCRIZIONE STUDENTE
+    @POST
+    @Path("/{corsoId}/iscrivi/{studenteId}")
+    public Response iscriviStudente(@PathParam("corsoId") Long corsoId,
+                                    @PathParam("studenteId") Long studenteId) {
+        boolean success = corsoService.iscriviStudente(corsoId, studenteId);
+
+        if (!success) {
+            return Response.status(Response.Status.BAD_REQUEST)
+                    .entity("Errore durante l'iscrizione").build();
+        }
+
+        return Response.ok("Studente iscritto correttamente").build();
+    }
+
 
     // 📌 UPDATE
     @PUT

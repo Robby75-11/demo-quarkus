@@ -1,39 +1,41 @@
 package com.example.model;
+
 import io.quarkus.hibernate.orm.panache.PanacheEntity;
 import jakarta.persistence.*;
+import java.util.HashSet;
+import java.util.Set;
 
-import java.util.List;
-
-@Table(name= "corsi")
 @Entity
+@Table(name = "corsi")
 public class Corso extends PanacheEntity {
-    public Corso() {
-    }
-
-    public Corso(String nome, List<Studente> studenti) {
-        this.nome = nome;
-        this.studenti = studenti;
-    }
 
     private String nome;
 
+    private String descrizione; // aggiunto campo descrizione
 
-    @OneToMany (mappedBy = "corso")
-    private List<Studente>studenti;
+    @ManyToMany
+    @JoinTable(
+            name = "corso_studente",
+            joinColumns = @JoinColumn(name = "corso_id"),
+            inverseJoinColumns = @JoinColumn(name = "studente_id")
+    )
+    private Set<Studente> studenti = new HashSet<>();
 
-    public String getNome() {
-        return nome;
-    }
+    // Costruttori
+    public Corso() {}
 
-    public void setNome(String nome) {
+    public Corso(String nome, String descrizione) {
         this.nome = nome;
+        this.descrizione = descrizione;
     }
 
-    public List<Studente> getStudenti() {
-        return studenti;
-    }
+    // Getter e Setter
+    public String getNome() { return nome; }
+    public void setNome(String nome) { this.nome = nome; }
 
-    public void setStudenti(List<Studente> studenti) {
-        this.studenti = studenti;
-    }
+    public String getDescrizione() { return descrizione; }
+    public void setDescrizione(String descrizione) { this.descrizione = descrizione; }
+
+    public Set<Studente> getStudenti() { return studenti; }
+    public void setStudenti(Set<Studente> studenti) { this.studenti = studenti; }
 }

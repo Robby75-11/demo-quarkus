@@ -1,7 +1,10 @@
 package com.example.service;
 
 import com.example.model.Corso;
+import com.example.model.Studente;
 import com.example.repository.CorsoRepository;
+import com.example.repository.StudenteRepository;
+
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
@@ -14,41 +17,51 @@ public class CorsoService {
     @Inject
     CorsoRepository corsoRepository;
 
-    // 📌 GET ALL
+    @Inject
+    StudenteRepository studenteRepository;
+
     public List<Corso> getAllCorsi() {
-        return corsoRepository.listAll();
+        return Corso.listAll();
     }
 
-    // 📌 GET BY ID
     public Corso getCorsoById(Long id) {
         return corsoRepository.findById(id);
     }
 
-    // 📌 CREATE
     @Transactional
     public Corso createCorso(Corso corso) {
         corsoRepository.persist(corso);
         return corso;
     }
 
-    // 📌 UPDATE
     @Transactional
-    public Corso updateCorso(Long id, Corso updatedCorso) {
-        Corso corso = corsoRepository.findById(id);
+    public Corso updateCorso(Long id, Corso corso) {
+        Corso existing = corsoRepository.findById(id);
+        if (existing == null) return null;
 
-        if (corso == null) {
-            return null;
-        }
-
-        corso.setNome(updatedCorso.getNome());
-        corso.setStudenti(updatedCorso.getStudenti());
-
-        return corso;
+        existing.setNome(corso.getNome());
+        existing.setDescrizione(corso.getDescrizione());
+        return existing;
     }
 
-    // 📌 DELETE
     @Transactional
     public boolean deleteCorso(Long id) {
         return corsoRepository.deleteById(id);
+    }
+
+    // 📌 Metodo per iscrivere uno studente a un corso
+    @Transactional
+    public boolean iscriviStudente(Long corsoId, Long studenteId) {
+        Corso corso = corsoRepository.findById(corsoId);
+        Studente studente = studenteRepository.findById(studenteId);
+
+        if (corso == null || studente == null) {
+            return false; // corso o studente non trovato
+        }
+
+        // Assumi che Corso abbia: Set<Studente> studenti
+        corso.getStudenti().add(studente);
+
+        return true; // iscrizione avvenuta
     }
 }
